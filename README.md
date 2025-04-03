@@ -29,11 +29,11 @@ To achieve this, we first assembled the robot car and tested basic motion throug
 • An HC-05 Bluetooth UART Module
 
 ### Part 1 - Assemble and test your robot
-Using the assembly from Lab 6, we attached Velcro to the motors and the bottom of the Arduino breadboard. We then secured the wheels from the kit onto the motors and carefully aligned and attached the motor's Velcro to the Velcro on the board, ensuring proper positioning for the robot to move effectively. The completed robot can be seen below in Figure 1.
+Using the assembly from Lab 6, we attached Velcro to the motors and the bottom of the Arduino breadboard. We then secured the wheels from the kit onto the motors and carefully aligned and attached the motor's Velcro to the Velcro on the board, ensuring proper positioning for the robot to move effectively. The final assembly should look like the completed robot seen below in Figure 1.
 
 ![Robot from website](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot%20from%20website.jpg)
 
-_Figure 1. Robot completed with wheels_
+_Figure 1. Robot completed with wheels (https://learn.sparkfun.com/tutorials/sparkfun-inventors-kit-experiment-guide---v40/circuit-5c-autonomous-robot)_
 
 Next, we connected the Arduino to the computer and ran the Lab 6 code to confirm that the robot responded correctly to serial commands, allowing it to move forward, backward, right, and left.
 
