@@ -65,7 +65,7 @@ _Figure 3. HC-05 Wiring Diagram (http://exploreembedded.com/wiki/Setting_up_Blue
 
 To connect the HC-05 module to our app, we accessed Dr. Jarro's GitHub repository, "BAE-305-Lab-Template," and used the "RobotSerialRC_BLU_Complete.ino" code. All the code provided in Part 3 of the Methods section was retrieved from this repository.
 
-First, insert the following code below before the setup function.
+First, we inserted the following code below before the setup function.
 
 ```c++
 #include <SoftwareSerial.h>
@@ -81,13 +81,13 @@ int botSpeed = 0;           //stores the speed of the whole robot
 boolean newData = false;
 ```
 
-Add the following code within the setup function.
+Next, we added the following code within the setup function.
 
 ```c++
   mySerial.begin(9600);       //Default Baud Rate for software serial communications
 ```
 
-Insert the following code within the "if (Serial.available() > 0)" section.
+Then, we inserted the following code within the "if (Serial.available() > 0)" section.
 
 ```c++
   recvWithEndMarker();
@@ -103,7 +103,7 @@ Insert the following code within the "if (Serial.available() > 0)" section.
   }
 ```
 
-Finally, add the following code at the end of the program.
+Finally, we added the following code at the end of the program.
 
 ```c++
 /********************************************************************************/
