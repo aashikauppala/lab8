@@ -31,7 +31,7 @@ To achieve this, we first assembled the robot car and tested basic motion throug
 ### Part 1 - Assemble and test your robot
 Using the assembly from Lab 6, we attached Velcro to the motors and the bottom of the Arduino breadboard. We then secured the wheels from the kit onto the motors and carefully aligned and attached the motor's Velcro to the Velcro on the board, ensuring proper positioning for the robot to move effectively. The completed robot can be seen below in Figure 1.
 
-![Robot 1](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot.jpg)
+![Robot from website](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot%20from%20website.jpg)
 
 _Figure 1. Robot completed with wheels_
 
@@ -50,260 +50,77 @@ From the Connectivity section, we added a Serial component named "Serial1" and f
 
 ![Code 1](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Code%201.png)
 
-Figure 2. App Inventor blocks needed to control the serial communications. (Carlos Jarro - Lab 8)
+_Figure 2. App Inventor blocks needed to control the serial communications. (Found in Lab 8 Instructions by Dr. Carlos Jarro)_
 
-Using the block “call serialObject.WriteSerial.data” and a regular “text” block to send the commands to the RedBoard. Each of the objects used to control the car will be used to send text commands via serial communications just as you used the Arduino IDE Serial Monitor.
+We used the "call serialObject.WriteSerial.data" block along with a standard "text" block to send commands to the RedBoard. Each object we used to control the car sent text commands via serial communication, similar to how we previously used the Arduino IDE Serial Monitor.
 
+Finally, we built our app by selecting 'Build' and then 'Android App (.apk).' Since no one in our group had an Android device, Dr. Jarro connected his phone using a USB-C to USB-A adapter and the standard Arduino cable. He then scanned the QR code to install and test our app on his device.
 
 ### Part 3 - Wireless Remote
+On an unused area of our breadboard, we wired the HC-05 module, using Figure 3 as a guidance. Using pins 2 and 3 for Rx and Tx, we included a 1kΩ and 2kΩ voltage divider instead of the 1.1kΩ and 3.3kΩ that are shown below in Figure 3.
 
+![Arduino Part 3](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Arduino%20Part%203.png)
 
+_Figure 3. HC-05 Wiring Diagram (http://exploreembedded.com/wiki/Setting_up_Bluetooth_HC-05_with_Arduino)_
 
-## Results
-### Part 1 - Assemble and test your robot
-Below is the code we used 
-### Part 2 - Develop the App
-### Part 3 - Wireless Remote
+To connect the HC-05 module to our app, we accessed Dr. Jarro's GitHub repository, "BAE-305-Lab-Template," and used the "RobotSerialRC_BLU_Complete.ino" code. All the code provided in Part 3 of the Methods section was retrieved from this repository.
 
+First, insert the following code below before the setup function.
 
-Code
 ```c++
-/*
-  SparkFun Inventor’s Kit
-  Circuit 5B - Remote Control Robot
-
-  Control a two wheeled robot by sending direction commands through the serial monitor.
-  This sketch was adapted from one of the activities in the SparkFun Guide to Arduino.
-  Check out the rest of the book at
-  https://www.sparkfun.com/products/14326
-
-  This sketch was written by SparkFun Electronics, with lots of help from the Arduino community.
-  This code is completely free for any use.
-
-  View circuit diagram and instructions at: https://learn.sparkfun.com/tutorials/sparkfun-inventors-kit-experiment-guide---v40
-  Download drawings and code at: https://github.com/sparkfun/SIK-Guide-Code
-
-  Modified by:
-  Carlos Jarro for University of Kentucky's BAE305 Lab 6
-  02/28/2024
-*/
 #include <SoftwareSerial.h>
 
 SoftwareSerial mySerial(2, 3); // HC-05 Tx connected to Arduino #2 & HC-05 Rx to Arduino #3
 
-const byte numChars = 6;       
+const byte numChars = 16;       
 char receivedChars[numChars];  // an array to store the received data
 char tempChars[numChars];
 
-char botDir[1];         // char type variable for the direction of the robot
-//                         botDirection[0] = 'f' (forward), 'b' (backwards)
-//                         'r' (right), 'l' (left), 's' (stop)
+char botDir[numChars] = {0};         // char type variable for the direction of the robot
 int botSpeed = 0;           //stores the speed of the whole robot
 boolean newData = false;
+```
 
-//the right motor will be controlled by the motor A pins on the motor driver
-const int AIN1 = 13;           //control pin 1 on the motor driver for the right motor
-const int AIN2 = 12;            //control pin 2 on the motor driver for the right motor
-const int PWMA = 11;            //speed control pin on the motor driver for the right motor
+Add the following code within the setup function.
 
-//the left motor will be controlled by the motor B pins on the motor driver
-const int PWMB = 10;           //speed control pin on the motor driver for the left motor
-const int BIN2 = 9;           //control pin 2 on the motor driver for the left motor
-const int BIN1 = 8;           //control pin 1 on the motor driver for the left motor
-
-const int trigPin = 6;        //trigger pin for distance snesor
-const int echoPin = 7;        //echo pin for distance sensor
-const int RED = 5;
-const int GREEN = 4;
-
-
-String botDirection;           //the direction that the robot will drive in (this change which direction the two motors spin in)
-String motorSpeedStr;
-
-int motorSpeed;               //speed integer for the motors
-float duration, distance;     //duration and distance for the distance sensor
-
-/********************************************************************************/
-void setup()
-{
+```c++
   mySerial.begin(9600);       //Default Baud Rate for software serial communications
+```
 
-  //set the motor control pins as outputs
-  pinMode(AIN1, OUTPUT);
-  pinMode(AIN2, OUTPUT);
-  pinMode(PWMA, OUTPUT);
+Insert the following code within the "if (Serial.available() > 0)" section.
 
-  pinMode(BIN1, OUTPUT);
-  pinMode(BIN2, OUTPUT);
-  pinMode(PWMB, OUTPUT);
-  
-  //set the distance sensor trigger pin as output and the echo pin as input
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-
-  pinMode(RED,OUTPUT);
-  pinMode(GREEN,OUTPUT);
-
-  Serial.begin(9600);           //begin serial communication with the computer
-
-  //prompt the user to enter a command
-  Serial.println("Enter a direction followed by speed.");
-  Serial.println("f = forward, b = backward, r = turn right, l = turn left, s = stop");
-  Serial.println("Example command: f 50 or s 0");
-}
-
-/********************************************************************************/
-void loop()
-{
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration*340/10000)/2; // Units are cm
-  //Serial.print("Distance: ");
-  //Serial.println(distance);
-    delayMicroseconds(50);
-
-  if (Serial.available() > 0)                         //if the user has sent a command to the RedBoard
-  {
-    botDirection = Serial.readStringUntil(' ');       //read the characters in the command until you reach the first space
-    motorSpeedStr = Serial.readStringUntil(' ');           //read the characters in the command until you reach the second space
-    motorSpeed = motorSpeedStr.toInt();
-    Serial.println(botDirection);
-  }
-
+```c++
   recvWithEndMarker();
   if (newData == true)
   {
     strcpy(tempChars, receivedChars);
     parseData();
+    botDirection = botDir;
     motorSpeed = botSpeed;
     newData = false;
-    Serial.println(botDir[0]);
+    Serial.println(botDirection);
     Serial.println(motorSpeed);
-   
   }
+```
 
-  if (distance > 10)
-  {                                                     //if the switch is in the ON position
-    if ((botDir[0] == 'f') || (botDirection == "f"))                         //if the entered direction is forward
-    {
-      rightMotor(-motorSpeed);                                //drive the right wheel forward
-      leftMotor(motorSpeed);                                 //drive the left wheel forward
-      digitalWrite(GREEN,HIGH);
-      digitalWrite(RED,LOW);
-    }
-    else if ((botDir[0] == 'b') || (botDirection == "b"))                    //if the entered direction is backward
-    {
-      rightMotor(motorSpeed);                               //drive the right wheel forward
-      leftMotor(-motorSpeed);                                //drive the left wheel forward
-      digitalWrite(GREEN,HIGH);
-      digitalWrite(RED,LOW);
-    }
-    else if ((botDir[0] == 'r') || (botDirection == "r"))                     //if the entered direction is right
-    {
-      rightMotor(motorSpeed);                               //drive the right wheel forward
-      leftMotor(motorSpeed);                                 //drive the left wheel forward
-      digitalWrite(GREEN,HIGH);
-      digitalWrite(RED,LOW);
-    }
-    else if ((botDir[0] == 'l') || (botDirection == "l"))                   //if the entered direction is left
-    {
-      rightMotor(-motorSpeed);                                //drive the right wheel forward
-      leftMotor(-motorSpeed);                                //drive the left wheel forward
-      digitalWrite(GREEN,HIGH);
-      digitalWrite(RED,LOW);
-    }
-    else if ((botDir[0] == 's') || (botDirection == "s"))
-    {
-      rightMotor(0);
-      leftMotor(0);
-      digitalWrite(GREEN,LOW);
-      digitalWrite(RED,HIGH);
-    }
-  }
-  else if (distance < 10)
-  {
-    if ((botDir[0] == 'b') || (botDirection == "b"))
-    {
-      rightMotor(motorSpeed);                               //drive the right wheel forward
-      leftMotor(-motorSpeed);                                //drive the left wheel forward
-    }
-    else
-    {
-      Serial.print("Object Detected at ");
-      Serial.print(distance);
-      Serial.println(" cm");
-      rightMotor(0);                                  //turn the right motor off
-      leftMotor(0);                                   //turn the left motor off
-    }
-  }
-}
-/********************************************************************************/
-void rightMotor(int motorSpeed)                       //function for driving the right motor
-{
-  if (motorSpeed > 0)                                 //if the motor should drive forward (positive speed)
-  {
-    digitalWrite(AIN1, HIGH);                         //set pin 1 to high
-    digitalWrite(AIN2, LOW);                          //set pin 2 to low
-  }
-  else if (motorSpeed < 0)                            //if the motor should drive backward (negative speed)
-  {
-    digitalWrite(AIN1, LOW);                          //set pin 1 to low
-    digitalWrite(AIN2, HIGH);                         //set pin 2 to high
-  }
-  else                                                //if the motor should stop
-  {
-    digitalWrite(AIN1, LOW);                          //set pin 1 to low
-    digitalWrite(AIN2, LOW);                          //set pin 2 to low
-  }
-  analogWrite(PWMA, abs(motorSpeed));                 //now that the motor direction is set, drive it at the entered speed
-}
+Finally, add the following code at the end of the program.
 
-/********************************************************************************/
-void leftMotor(int motorSpeed)                        //function for driving the left motor
-{
-  if (motorSpeed > 0)                                 //if the motor should drive forward (positive speed)
-  {
-    digitalWrite(BIN1, HIGH);                         //set pin 1 to high
-    digitalWrite(BIN2, LOW);                          //set pin 2 to low
-  }
-  else if (motorSpeed < 0)                            //if the motor should drive backward (negative speed)
-  {
-    digitalWrite(BIN1, LOW);                          //set pin 1 to low
-    digitalWrite(BIN2, HIGH);                         //set pin 2 to high
-  }
-  else                                                //if the motor should stop
-  {
-    digitalWrite(BIN1, LOW);                          //set pin 1 to low
-    digitalWrite(BIN2, LOW);                          //set pin 2 to low
-  }
-  analogWrite(PWMB, abs(motorSpeed));                 //now that the motor direction is set, drive it at the entered speed
-}
-
+```c++
 /********************************************************************************/
 void recvWithEndMarker() {
     static byte ndx = 0;
     char endMarker = '\n';
     char rc;
-    while (mySerial.available() > 0 && newData == false)
-    {
+    while (mySerial.available() > 0 && newData == false){
       rc = mySerial.read();
-
-      if (rc != endMarker)
-      {
+      if (rc != endMarker) {
         receivedChars[ndx] = rc;
         ndx++;
-        if (ndx >= numChars)
-        {
+        if (ndx >= numChars){
           ndx = numChars - 1;
         }
       }
-      else
-      {
+      else {
         receivedChars[ndx] = '\0'; // terminate the string
         ndx = 0;
         newData = true;
@@ -314,15 +131,75 @@ void recvWithEndMarker() {
 void parseData() {      // split the data into its parts
 
     char * strtokIndx; // this is used by strtok() as an index
-
     strtokIndx = strtok(tempChars," ");      // get the first part - the string
     strcpy(botDir, strtokIndx); // copy it to messageFromPC
  
     strtokIndx = strtok(NULL, " "); // this continues where the previous call left off
-    botSpeed = atoi(strtokIndx);     // convert this part to an integer
+    //strcpy(botSpeed, strtokIndx); // Use this line for sending speed as text
+    botSpeed = atoi(strtokIndx);     // Use this line for sending sepeed as an integer
+
 }
 ```
 
+After connecting the HC-05 module to the Arduino and linking it with the code, the next step was to integrate it into the app and test the system. However, we ran out of time during the lab. The rest of the instructions that we have included below are pasted directly from Dr. Jarro's Lab 8 Instructions.
+
+"Open App Inventor 2 and save a copy of your previous app, give it a descriptive name. In the Designer environment:
+
+a. From the section Connectivity, add the object BluetoothClient. This will allow you to send data via Bluetooth.
+
+b. From the section User Interface add a ListPicker object. This is a button that will let us select the Bluetooth-paired device we need to send data to.
+
+c. From the section User Interface add a Label object. This will show the status of the Bluetooth connection.
+
+d. Download the file GetApiLevel from the Instructor’s GitHub account (Lab-Template Repository).
+
+e. On the section Extension click the link Import extension and import the file you just downloaded. Add the GetApiLevel object.
+
+f. From the Storage section add a TinyDB object
+
+g. In the Blocks environment, add the blocks shown in Figure 8. BluetoothPicker is the ListPicker and StatusLabel is the label added for Bluetooth control.
+
+h. For each of the buttons, replace the “call serialobject.WriteSerial” block with a “call BluetoothClient.SendText” block as shown in Figure 7. Make sure to include the new line command “/n”, this is used by the Arduino code to identify the end of the sent command. The global variable Speed is used to store the bot speed value, you can use your variable name or not use a variable.
+
+Test your system and show it to your instructor."
+
+## Results
+### Part 1 - Assemble and test your robot
+We utilized the same code from Lab 6, as our robot's minimum speed remained lower than the predefined "slow" setting. The minimum speed required for movement was 50, with more details provided in the discussion section. Our assembled robot is shown below in Figure 4.
+
+![Robot 1](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot.jpg)
+
+_Figure 4. Assembled robot_
+
+### Part 2 - Develop the App
+We created buttons using the "call serialObject.WriteSerial.data" block combined with a standard "text" block. Each "text" block contained the specific command used to trigger the corresponding function that determines the robot's direction and speed. The code behind each button is shown below in Figures 5, 6, and 7.
+
+![Code 2](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Code%202.png)
+
+_Figure 5. Code for the buttons controlling the car's slow driving mode_
+
+![Code 3](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Code%203.png)
+
+_Figure 6. Code for the buttons controlling the car's medium driving mode_
+
+![Code 4](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Code%204.png)
+
+_Figure 7. Code for the buttons controlling the car's fast driving mode_
+
+The display screen for our app is shown below.
+
+![Screen](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Screen.png)
+
+_Figure 8. Display screen on our app_
+
+### Part 3 - Wireless Remote
+We successfully connected the HC-05 module to our breadboard, as shown below in Figure 9.
+
+![Robot 2](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot%202.jpg)
+
+_Figure 9. Robot connected to the HC-05 Bluetooth module_
+
+We did not have time to connect the HC-05 Bluetooth module to our app.
 
 ## Discussion
 _In Lab 6 we found out what was the minimum speed that will move the motors. What is the minimum speed that will move the complete car?_
