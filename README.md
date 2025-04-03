@@ -29,17 +29,43 @@ To achieve this, we first assembled the robot car and tested basic motion throug
 • An HC-05 Bluetooth UART Module
 
 ### Part 1 - Assemble and test your robot
-Using the assembly from lab 6, add velco to the motors as well as on the bottom of the Arduino breadboard. Attach the wheels in the kit to the motors and connect the velcro of the motor to the velcro on the board so that the two wheels are placed so that the board can move as a robot, being careful with the alignment.
-Connect the Arduino to the computer and run the code from Lab 6 to verify that the robot moves forward, backward, right, and left according to the commands sent via serial communications.
-Attach a binder clip to the end of the Arduino board so that the board is lifted off the surface and the battery pack on the bottom of the robot will not touch the surface.
+Using the assembly from Lab 6, we attached Velcro to the motors and the bottom of the Arduino breadboard. We then secured the wheels from the kit onto the motors and carefully aligned and attached the motor's Velcro to the Velcro on the board, ensuring proper positioning for the robot to move effectively. The completed robot can be seen below in Figure 1.
+
+![Robot 1](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Robot.jpg)
+
+_Figure 1. Robot completed with wheels_
+
+Next, we connected the Arduino to the computer and ran the Lab 6 code to confirm that the robot responded correctly to serial commands, allowing it to move forward, backward, right, and left.
+
+Finally, we attached a binder clip to the end of the Arduino board to slightly elevate it, ensuring the battery pack underneath did not touch the surface. We then tested the robot at various speeds to determine the minimum speed at which it could still operate effectively.
 
 ### Part 2 - Develop the App
+_Note: The following instructions are based on a Windows laptop. We followed the setup guide provided at http://appinventor.mit.edu/explore/ai2/setup.html. If you are using a different operating system, you can refer to the same website for installation instructions._
+
+We installed the App Inventor Setup software package, created an account, logged into the App Inventor 2 web-based tool, and launched aiStarter. To keep our work organized, we created a new project with a descriptive name, ensuring it could be easily identified if an instructor or another user wanted to install our app on their phone.
+
+In the Designer environment, we added a button named "Open_Ser" to initialize serial communication, a label to display incoming communication strings from the Arduino, and multiple user interface elements to control the car’s movement. This allowed it to move forward, backward, right, and left at slow, medium, and fast speeds.
+
+From the Connectivity section, we added a Serial component named "Serial1" and from the Sensors section add a Clock component named "ReadFromArduino." Switching to the Blocks environment, we added the blocks shown below in Figure 2 to establish the communications after pressing the serial communications button.
+
+![Code 1](https://github.com/aashikauppala/lab8/blob/main/Lab%208%20Code%201.png)
+
+Figure 2. App Inventor blocks needed to control the serial communications. (Carlos Jarro - Lab 8)
+
+Using the block “call serialObject.WriteSerial.data” and a regular “text” block to send the commands to the RedBoard. Each of the objects used to control the car will be used to send text commands via serial communications just as you used the Arduino IDE Serial Monitor.
+
 
 ### Part 3 - Wireless Remote
 
 
 
 ## Results
+### Part 1 - Assemble and test your robot
+Below is the code we used 
+### Part 2 - Develop the App
+### Part 3 - Wireless Remote
+
+
 Code
 ```c++
 /*
